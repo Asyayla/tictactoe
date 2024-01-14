@@ -1,5 +1,6 @@
 # tictactoe <br>
-It has <br>
+It is a tic tac toe game played against artificial intelligence, I hope you enjoy it.<br>
+#It has <br>
 *The user can choose the tile she wants and the game continues accordingly <br>
 <br>
 # It doesn't has<br>
