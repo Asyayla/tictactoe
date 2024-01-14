@@ -112,7 +112,7 @@ void playermove(char* spaces, char player) {
           cin >> number;
           number--;
      if(spaces[number]==' ') {
-          spaces[number]==player;
+          spaces[number]=player;
           break;
      }
      else {
@@ -188,6 +188,6 @@ void aimove(char* spaces, char ai) {
 }
 void cleanboard(char* spaces) {
      for(int i=0; i<9; i++) {
-          spaces[i]==' ';
+          spaces[i]=' ';
      }
 }
