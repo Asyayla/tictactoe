@@ -1,19 +1,18 @@
 #include <iostream>
 using namespace std;
 
-
-bool checkWinner(char* board, char player, char ai);
-bool checkTie(char* board);
-void playerMove(char* board);
-void aiMove(char* board, char ai, char player);
-void displayBoard(char* board);
-void cleanBoard(char* board);
+bool checkWinner(char board[9], char player, char ai);
+bool checkTie(char board[9]);
+void playerMove(char board[9]);
+void aiMove(char board[9], char ai, char player);
+void displayBoard(char board[9]);
+void cleanBoard(char board[9]);
+bool handleEndGame(char board[9], char player, char ai);
 
 int main() {
     char board[9] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ' };
     char player = 'X';
     char ai = 'O';
-    char again;
     bool running = true;
 
     while (running) {
@@ -21,49 +20,35 @@ int main() {
         playerMove(board);
         displayBoard(board);
 
-        if (checkWinner(board, player, ai)) {
-            cout << "\nDo you want to play again? (Y-Yes N-No): ";
-            cin >> again;
-            if (again == 'n' || again == 'N') running = false;
-            else cleanBoard(board);
-            continue;
-        }
-        if (checkTie(board)) {
-            cout << "\nDo you want to play again? (Y-Yes N-No): ";
-            cin >> again;
-            if (again == 'n' || again == 'N') running = false;
-            else cleanBoard(board);
-            continue;
-        }
+        if (handleEndGame(board, player, ai)) continue;
 
         aiMove(board, ai, player);
         displayBoard(board);
 
-        if (checkWinner(board, player, ai)) {
-            cout << "\nDo you want to play again? (Y-Yes N-No): ";
-            cin >> again;
-            if (again == 'n' || again == 'N') running = false;
-            else cleanBoard(board);
-            continue;
-        }
-        if (checkTie(board)) {
-            cout << "\nDo you want to play again? (Y-Yes N-No): ";
-            cin >> again;
-            if (again == 'n' || again == 'N') running = false;
-            else cleanBoard(board);
-            continue;
-        }
+        if (handleEndGame(board, player, ai)) continue;
     }
 
     return 0;
 }
 
+// Returns true if game ended (win or tie), and resets board if player wants
+bool handleEndGame(char board[9], char player, char ai) {
+    char again;
+    if (checkWinner(board, player, ai) || checkTie(board)) {
+        cout << "\nDo you want to play again? (Y/N): ";
+        cin >> again;
+        if (again == 'n' || again == 'N') return false;
+        cleanBoard(board);
+        return true;
+    }
+    return false;
+}
 
-bool checkWinner(char* board, char player, char ai) {
+bool checkWinner(char board[9], char player, char ai) {
     int wins[8][3] = {
-        {0,1,2},{3,4,5},{6,7,8}, 
-        {0,3,6},{1,4,7},{2,5,8}, 
-        {0,4,8},{2,4,6}           
+        {0,1,2},{3,4,5},{6,7,8},
+        {0,3,6},{1,4,7},{2,5,8},
+        {0,4,8},{2,4,6}
     };
 
     for (int i = 0; i < 8; i++) {
@@ -77,30 +62,27 @@ bool checkWinner(char* board, char player, char ai) {
     return false;
 }
 
-
-bool checkTie(char* board) {
+bool checkTie(char board[9]) {
     for (int i = 0; i < 9; i++)
         if (board[i] == ' ') return false;
-
-    cout << "The game is tie.\n";
+    cout << "The game is a tie.\n";
     return true;
 }
 
-
-void playerMove(char* board) {
+void playerMove(char board[9]) {
     int move;
     while (true) {
         cout << "Choose a position (1-9): ";
         cin >> move;
 
-        if (cin.fail()) { 
+        if (cin.fail()) {
             cin.clear();
             cin.ignore(10000, '\n');
             cout << "Invalid input. Enter a number 1-9.\n";
             continue;
         }
 
-        move--; 
+        move--;
         if (move >= 0 && move < 9 && board[move] == ' ') {
             board[move] = 'X';
             break;
@@ -109,8 +91,7 @@ void playerMove(char* board) {
     }
 }
 
-
-void displayBoard(char* board) {
+void displayBoard(char board[9]) {
     cout << endl;
     cout << " " << board[0] << " | " << board[1] << " | " << board[2] << " \n";
     cout << "---+---+---\n";
@@ -120,9 +101,8 @@ void displayBoard(char* board) {
     cout << endl;
 }
 
-
-void aiMove(char* board, char ai, char player) {
-    
+void aiMove(char board[9], char ai, char player) {
+    // Try to win
     for (int i = 0; i < 9; i++) {
         if (board[i] == ' ') {
             board[i] = ai;
@@ -130,7 +110,8 @@ void aiMove(char* board, char ai, char player) {
             board[i] = ' ';
         }
     }
-    
+
+    // Block player
     for (int i = 0; i < 9; i++) {
         if (board[i] == ' ') {
             board[i] = player;
@@ -141,12 +122,13 @@ void aiMove(char* board, char ai, char player) {
             board[i] = ' ';
         }
     }
-    
+
+    // Take center if free
     if (board[4] == ' ') { board[4] = ai; return; }
 
-    
-    int positions[9] = {0,2,6,8,1,3,5,7};
-    for (int i = 0; i < 9; i++) {
+    // Take corners and sides
+    int positions[8] = {0,2,6,8,1,3,5,7};
+    for (int i = 0; i < 8; i++) {
         if (board[positions[i]] == ' ') {
             board[positions[i]] = ai;
             return;
@@ -154,7 +136,6 @@ void aiMove(char* board, char ai, char player) {
     }
 }
 
-
-void cleanBoard(char* board) {
+void cleanBoard(char board[9]) {
     for (int i = 0; i < 9; i++) board[i] = ' ';
 }
